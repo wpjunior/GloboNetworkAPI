@@ -49,6 +49,7 @@ class Provision:
         try:
             # Write contents to file.
             # Using mode 'w' truncates the file.
+            log.debug("Salvando arquivo: %s" % fileout)
             file_handle = open(fileout, 'w')
             file_handle.write(file_string)
             file_handle.close()
@@ -430,6 +431,7 @@ class Provision:
                     ### TO BERRINI
                     ## To pop Berrini we use new variables, this make the new cross topology and old topology run to.
 
+                    log.debug(spine_num)
                     if spine_num == 1:
                         variablestochangespine1["VLANBORDA2LEAF"] = str(vlanBO[spine_num])
                         variablestochangespine1["VLANBORDA2CACHOSLEAF"] = str(vlanBOCA[spine_num])
@@ -497,14 +499,14 @@ class Provision:
                                 variablestochangespine1["INT_LF_2{}UPLINK".format(interface2_counter)] = iface.get("eq_interface")
                                 variablestochangespine1["DESCRIPTION2CONNECT"] = equips_sorted[0].get("nome")
                                 variablestochangespine1["DESCRIPTION1CONNECT"] = equips_sorted[1].get("nome")
-                                variablestochangespine1["PO2CHANNEL"] = variablestochangespine1["SINGLE21INT"].split('/')[-1].split(':')[0]
+                                variablestochangespine1["NUM_CHANNEL"] = variablestochangespine1["SINGLE21INT"].split('/')[-1].split(':')[0]
 
                                 interface2_counter += 1
 
                             elif iface_name[:3] == self.spine_prefix and int(iface_name[-1]) == 1:
                                 variablestochangespine1["SINGLE1{}INT".format(interface1_counter)] = iface.get("interface")
                                 variablestochangespine1["INT_LF_1{}UPLINK".format(interface1_counter)] = iface.get("eq_interface")
-                                variablestochangespine1["PO1CHANNEL"] = variablestochangespine1["SINGLE11INT"].split('/')[-1].split(':')[0]
+                                variablestochangespine1["NUM_CHANNEL"] = variablestochangespine1["SINGLE11INT"].split('/')[-1].split(':')[0]
                                 variablestochangespine1["DESCRIPTION1CONNECT"] = equips_sorted[0].get("nome")
                                 variablestochangespine1["DESCRIPTION2CONNECT"] = equips_sorted[1].get("nome")
                                 interface1_counter += 1
@@ -584,32 +586,45 @@ class Provision:
             #### ANOTHER BERRINI BLOCK
             ## Here we invert the variables of description, due unique template to diferent spines
             ## without this invertion, the description run well on spine 2 but on spine 1 they are inverted
+            variablestochangeleaf1['DFS_SOURCE_IP'] = '10.126.24.12'
+            variablestochangeleaf1['DFS_PEER_IP'] = '10.126.24.13'
+            variablestochangeleaf1["INT_GERENCIA_OOB"] = "47"
+            log.debug(variablestochangeleaf1)
             if int(equip.get('nome')[-1]) == 2:
                 ### Here we must have to invert the variables to leaf2, due the new topology
-                sp1_hostname = variablestochangeleaf1["SP1_HOSTNAME"]
+                # sp1_hostname = variablestochangeleaf1["SP1_HOSTNAME"]
                 sp2_hostname = variablestochangeleaf1["SP2_HOSTNAME"]
                 variablestochangeleaf1["SP1_HOSTNAME"] = sp2_hostname
-                variablestochangeleaf1["SP2_HOSTNAME"] = sp1_hostname
+                # variablestochangeleaf1["SP2_HOSTNAME"] = sp1_hostname
 
-                if1_sp1 = variablestochangeleaf1['INTERFACE1_SP1']
-                if2_sp1 = variablestochangeleaf1['INTERFACE2_SP1']
-                if3_sp1 = variablestochangeleaf1['INTERFACE3_SP1']
-                if4_sp1 = variablestochangeleaf1['INTERFACE4_SP1']
+                # if1_sp1 = variablestochangeleaf1['INTERFACE1_SP1']
+                # if2_sp1 = variablestochangeleaf1['INTERFACE2_SP1']
+                # if3_sp1 = variablestochangeleaf1['INTERFACE3_SP1']
+                # if4_sp1 = variablestochangeleaf1['INTERFACE4_SP1']
 
                 if1_sp2 = variablestochangeleaf1['INTERFACE1_SP2']
-                if2_sp2 = variablestochangeleaf1['INTERFACE2_SP2']
-                if3_sp2 = variablestochangeleaf1['INTERFACE3_SP2']
-                if4_sp2 = variablestochangeleaf1['INTERFACE4_SP2']
+                # if2_sp2 = variablestochangeleaf1['INTERFACE2_SP2']
+                # if3_sp2 = variablestochangeleaf1['INTERFACE3_SP2']
+                # if4_sp2 = variablestochangeleaf1['INTERFACE4_SP2']
 
                 variablestochangeleaf1['INTERFACE1_SP1'] = if1_sp2
-                variablestochangeleaf1['INTERFACE2_SP1'] = if2_sp2
-                variablestochangeleaf1['INTERFACE3_SP1'] = if3_sp2
-                variablestochangeleaf1['INTERFACE4_SP1'] = if4_sp2
+                # variablestochangeleaf1['INTERFACE2_SP1'] = if2_sp2
+                # variablestochangeleaf1['INTERFACE3_SP1'] = if3_sp2
+                # variablestochangeleaf1['INTERFACE4_SP1'] = if4_sp2
 
-                variablestochangeleaf1['INTERFACE1_SP2'] = if1_sp1
-                variablestochangeleaf1['INTERFACE2_SP2'] = if2_sp1
-                variablestochangeleaf1['INTERFACE3_SP2'] = if3_sp1
-                variablestochangeleaf1['INTERFACE4_SP2'] = if4_sp1
+                # variablestochangeleaf1['INTERFACE1_SP2'] = if1_sp1
+                # variablestochangeleaf1['INTERFACE2_SP2'] = if2_sp1
+                # variablestochangeleaf1['INTERFACE3_SP2'] = if3_sp1
+                # variablestochangeleaf1['INTERFACE4_SP2'] = if4_sp1
+
+                vlan_bo_leaf_sp1 = variablestochangeleaf1["VLANBORDALEAFSP1"]
+                vlan_bo_leaf_sp2 = variablestochangeleaf1["VLANBORDALEAFSP2"]
+
+                variablestochangeleaf1["VLANBORDALEAFSP1"] = vlan_bo_leaf_sp2
+                variablestochangeleaf1["INT_GERENCIA_OOB"] = "48"
+                # variablestochangeleaf1["VLANBORDALEAFSP1"] = str(vlanBO[spn])
+                # variablestochangeleaf1["VLANBORDALEAFSP2"] = str(vlanBO[spn + 1])
+
 
                 vlan_ber_be1= variablestochangeleaf1["VLANBERBELEAFSP1"]
                 vlan_ber_be2= variablestochangeleaf1["VLANBERBELEAFSP2"]
@@ -631,13 +646,26 @@ class Provision:
                 variablestochangeleaf1["VLANBERBORDACACHOSLEAFSP2"] = vlan_ber_bc1
                 variablestochangeleaf1["VLANBERBORDACACHOSBLEAFSP1"] = vlan_ber_bcb2
                 variablestochangeleaf1["VLANBERBORDACACHOSBLEAFSP2"] = vlan_ber_bcb1
-                as_spine1 = variablestochangeleaf1["ASSPINE1"]
+
+                variablestochangeleaf1['DFS_SOURCE_IP'] = '10.126.24.13'
+                variablestochangeleaf1['DFS_PEER_IP'] = '10.126.24.12'
+                # as_spine1 = variablestochangeleaf1["ASSPINE1"]
                 as_spine2 = variablestochangeleaf1["ASSPINE2"]
                 variablestochangeleaf1["ASSPINE1"] = as_spine2
-                variablestochangeleaf1["ASSPINE2"] = as_spine1
+                # variablestochangeleaf1["ASSPINE2"] = as_spine1
 
-            variablestochangeleaf1['LFPO1'] = variablestochangeleaf1['INTERFACE1_SP1'].split('/')[-1].split(':')[0]
-            variablestochangeleaf1['LFPO2'] = variablestochangeleaf1['INTERFACE1_SP2'].split('/')[-1].split(':')[0]
+            # variablestochangeleaf1['LFPO1'] = variablestochangeleaf1['INTERFACE1_SP1'].split('/')[-1].split(':')[0]
+            # variablestochangeleaf1['LFPO2'] = variablestochangeleaf1['INTERFACE1_SP2'].split('/')[-1].split(':')[0]
+            variablestochangeleaf1["BASE_NETWORK_HOST_FE_IPV4"] = variablestochangeleaf1["NET_HOST_FE_IPV4"].split("/")[0]
+
+            variablestochangeleaf1["BASE_NETWORK_HOST_BE_IPV4"] = variablestochangeleaf1["NET_HOST_BE_IPV4"].split("/")[0]
+
+            variablestochangeleaf1["BASE_NETWORK_HOST_FE_IPV6"] = variablestochangeleaf1["NET_HOST_FE_IPV6"].split("/")[0]
+            variablestochangeleaf1["BASE_NETWORK_HOST_BE_IPV6"] = variablestochangeleaf1["NET_HOST_BE_IPV6"].split("/")[0]
+            variablestochangeleaf1['BASE_MASK_HOST_BE_IPV6'] = variablestochangeleaf1["NET_HOST_BE_IPV6"].split("/")[1]
+
+            variablestochangeleaf1['BASE_NETWORK_HOST_BO_DSR_IPV6'] = variablestochangeleaf1['NET_HOST_BO_DSR_IPV6'].split('/')[0]
+            variablestochangeleaf1['BASE_MASK_HOST_BO_DSR_IPV6'] = variablestochangeleaf1['NET_HOST_BO_DSR_IPV6'].split('/')[1]
 
             ### End Berrini Block
 
@@ -720,6 +748,7 @@ class Provision:
         variablestochangeoob["OWN_IP_MGMT"] = oob.get("ip_mngt")
         variablestochangeoob["HOSTNAME_OOB"] = oob.get("nome")
         variablestochangeoob["HOSTNAME_RACK"] = self.rack.nome
+        log.debug(equips_sorted)
 
         fileinoob = path_to_guide + oob.get("roteiro")
         fileoutoob = path_to_config + oob.get("nome") + ".cfg"
@@ -728,6 +757,18 @@ class Provision:
             nome = equip.get("nome")
             log.debug(str(nome))
             roteiro = equip.get("roteiro")
+
+            ### To Pop Berrini
+            base_leaf_hostname = "LF-" + variablestochangeoob['HOSTNAME_OOB'].split('-')[1] + "-R"+ str(self.rack.numero) +"-"
+            variablestochangeoob['LEAF1_HOSTNAME'] = base_leaf_hostname + "1"
+            variablestochangeoob['LEAF2_HOSTNAME'] = base_leaf_hostname + "2"
+
+            variablestochangecore1["CHANNEL_NUMBER"] = str(self.rack.numero)
+            variablestochangecore2["CHANNEL_NUMBER"] = str(self.rack.numero)
+            variablestochangecore1["RACK_NUMBER"] = str(self.rack.numero)
+            variablestochangecore2["RACK_NUMBER"] = str(self.rack.numero)
+            ### End Block
+
             if nome[:3] == self.leaf_prefix:
                 if nome[-1] == "1":
                     variablestochangeoob["HOSTNAME_LF1"] = nome
