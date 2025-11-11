@@ -41,6 +41,16 @@ class InterfaceOverrideValidator:
                 for target_interface_str in target_interface_str_list:
 
                     log.info("Validating '%s' with '%s'", source_interface_str, source_interface_str)
+
+                    if (
+                        'mngmt' in target_interface_str.lower() or 
+                        'mgmt' in target_interface_str.lower() or 
+                        'management' in target_interface_str.lower() or 
+                        'eth0' in target_interface_str.lower()
+                    ):
+                        log.warning("Skipping overriding validation: '%s' with '%s' (management interface)", source_interface_str, target_interface_str)
+                        continue
+
                     source_interface_array = [int(num) for num in re.findall(r'\d+', source_interface_str)]
                     target_interface_array = [int(num) for num in re.findall(r'\d+', target_interface_str)]
                     response = self._is_overriding(

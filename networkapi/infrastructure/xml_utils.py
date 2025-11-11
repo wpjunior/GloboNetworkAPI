@@ -55,7 +55,8 @@ def _add_text_node(value, node, doc):
     if not isinstance(value, StringTypes):
         text = '%s' % unicode(value)
     else:
-        text = r'%s' % value.replace('%', '%%')
+        # text = r'%s' % value.replace('%', '%%')
+        text = value
 
     try:
         textNode = doc.createTextNode(text)
