@@ -4,6 +4,15 @@ APP_PIDFILE=/var/run/netapi.pid
 APP_READY=0
 ODL_READY=0
 
+# Check if SDN containers are running
+docker inspect ovs1 >/dev/null 2>&1
+SDN_AVAILABLE=$?
+
+if [ "$SDN_AVAILABLE" -ne "0" ]; then
+    echo "SDN containers not available, skipping ODL check"
+    ODL_READY=1
+fi
+
 echo "Checking if containers are ready"
 
 MAX_RETRY=30
