@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start app containers
+        run: docker compose up -d
+
+      - name: Start SDN containers
+        continue-on-error: true
+        run: docker compose -f scripts/travis/docker-compose-sdn-travis.yml up -d
+
+      - name: Wait for containers to be ready
+        run: ./scripts/travis/wait_for_containers.sh
+
+      - name: Show running containers
+        run: docker ps --all
+
+      - name: Run tests
+        run: docker exec netapi_app ./fast_start_test.sh networkapi/
+
+      - name: Debug info (on failure)
+        if: failure()
+        run: |
+          docker exec ovs1 ovs-vsctl show || true
+          docker ps --all
+          docker exec netapi_app tail /tmp/networkapi.log || true
