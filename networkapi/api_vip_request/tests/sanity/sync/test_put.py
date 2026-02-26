@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-import unittest
 
-from django.conf import settings
+from mock import patch
+
 from django.core.management import call_command
 from django.test.client import Client
 
@@ -32,19 +32,21 @@ def setup():
     )
 
 
-@unittest.skipIf(
-    settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3',
-    'VIP request tests require MySQL (RequisicaoVips BooleanFields lack defaults)'
-)
 class VipRequestPutTestCase(NetworkApiTestCase):
 
     def setUp(self):
         self.client = Client()
+        # Fix BooleanFields without defaults for SQLite compatibility
+        from networkapi.requisicaovips.models import RequisicaoVips
+        RequisicaoVips._meta.get_field('validado').default = False
+        RequisicaoVips._meta.get_field('vip_criado').default = False
+        RequisicaoVips._meta.get_field('filter_valid').default = False
 
     def tearDown(self):
         pass
 
-    def test_put_two_vips_success(self):
+    @patch('networkapi.api_vip_request.syncs.new_to_old')
+    def test_put_two_vips_success(self, mock_new_to_old):
         """Test of success to put two vips."""
 
         name_file = 'api_vip_request/tests/sanity/json/put/test_vip_request_put_two.json'
