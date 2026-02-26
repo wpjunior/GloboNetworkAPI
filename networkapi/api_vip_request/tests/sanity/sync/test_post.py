@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import unittest
 
+from django.conf import settings
 from django.core.management import call_command
 from django.test.client import Client
 
@@ -29,6 +31,10 @@ def setup():
     )
 
 
+@unittest.skipIf(
+    settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3',
+    'VIP request tests require MySQL (RequisicaoVips BooleanFields lack defaults)'
+)
 class VipRequestPostTestCase(NetworkApiTestCase):
 
     def setUp(self):
