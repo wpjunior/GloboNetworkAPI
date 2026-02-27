@@ -44,9 +44,11 @@ class VipRequestPostTestCase(NetworkApiTestCase):
     def tearDown(self):
         pass
 
+    @patch('networkapi.plugins.factory.PluginFactory.factory')
     @patch('networkapi.api_vip_request.syncs.new_to_old')
-    def test_post_two_vips_success(self, mock_new_to_old):
+    def test_post_two_vips_success(self, mock_new_to_old, mock_plugin_factory):
         """Test of success to post one vip."""
+        mock_plugin_factory.return_value.get_name_eqpt.return_value = 'VIP1_test_80'
 
         name_file = 'api_vip_request/tests/sanity/json/post/test_vip_request_post_2_ports.json'
 
